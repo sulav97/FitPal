@@ -1,4 +1,4 @@
-# flutter_application_1
+# fitpal
 
 A new Flutter project.
 
