@@ -1,5 +1,6 @@
-import 'package:fitpal/signup.dart';
+import 'package:college_community_mobileapp/view/splashscreen.dart';
 import 'package:flutter/material.dart';
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -7,14 +8,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Login App',
-      theme: ThemeData(
-        colorScheme: ColorScheme.dark(
-          primary: const Color(0xFF007AFF),
-          background: Colors.black,
-        ),
-      ),
-      home: const SignUpScreen(),
+      title: 'Flutter Dashboard',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: const SplashscreenView(),
     );
   }
 }
