@@ -1,3 +1,4 @@
+import 'package:college_community_mobileapp/core/theme/theme.dart';
 import 'package:college_community_mobileapp/view/splashscreen.dart';
 import 'package:flutter/material.dart';
 
@@ -9,7 +10,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Dashboard',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      debugShowCheckedModeBanner: false,
+      theme: getApplicationTheme(),
       home: const SplashscreenView(),
     );
   }
