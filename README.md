@@ -1,4 +1,4 @@
-# fitpal
+# college_community_mobileapp
 
 A new Flutter project.
 
