@@ -1,7 +1,7 @@
+import 'package:college_community_mobileapp/view/bottom_navigation_view.dart';
 import 'package:college_community_mobileapp/view/register.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import './dashboard.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,9 +12,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const LoginView(),
+      home: LoginView(),
     );
   }
 }
@@ -113,10 +113,11 @@ class _LoginScreenState extends State<LoginView> {
                     onPressed: () {
                       if (_emailController.text.trim() == 'admin' &&
                           _passwordController.text.trim() == 'admin') {
-                        Navigator.push(
+                        Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const DashboardView()),
+                              builder: (context) =>
+                                  const BottomNavigationView()),
                         );
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(

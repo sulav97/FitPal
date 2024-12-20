@@ -27,7 +27,7 @@ class SplashscreenView extends StatelessWidget {
     Future.delayed(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const OnboardView()),
+        MaterialPageRoute(builder: (context) => OnboardingScreen()),
       );
     });
 
