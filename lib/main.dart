@@ -1,12 +1,19 @@
-import './app.dart';
+import 'package:college_community_mobileapp/app/app.dart';
+import 'package:college_community_mobileapp/app/di/di.dart';
+import 'package:college_community_mobileapp/core/network/hive_service.dart';
 import 'package:flutter/material.dart';
 
-// final
-// const
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // Initialize Hive Database
+  await HiveService.init();
 
-// HOT RELOAD
-void main() {
+  // Delete all the hive data and boxes
+  // await HiveService().clearAll();
+  // Initialize Dependencies
+  await initDependencies();
+
   runApp(
-    const MyApp(),
+    const App(),
   );
 }
