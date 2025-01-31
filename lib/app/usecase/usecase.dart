@@ -1,5 +1,5 @@
-import 'package:college_community_mobileapp/core/error/failure.dart';
 import 'package:dartz/dartz.dart';
+import 'package:softwarica_student_management_bloc/core/error/failure.dart';
 
 abstract interface class UsecaseWithParams<SuccessType, Params> {
   Future<Either<Failure, SuccessType>> call(Params params);

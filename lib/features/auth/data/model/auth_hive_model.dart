@@ -1,66 +1,89 @@
-import 'package:college_community_mobileapp/app/constants/hive_table_constant.dart'; // Assuming this is where your constants are located
-import 'package:college_community_mobileapp/features/auth/domain/entity/auth_entity.dart'; // AuthEntity
 import 'package:equatable/equatable.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:uuid/uuid.dart'; // For generating unique IDs
+import 'package:hive_flutter/adapters.dart';
+import 'package:softwarica_student_management_bloc/app/constants/hive_table_constant.dart';
+import 'package:softwarica_student_management_bloc/features/auth/domain/entity/auth_entity.dart';
+import 'package:softwarica_student_management_bloc/features/batch/data/model/batch_hive_model.dart';
+import 'package:softwarica_student_management_bloc/features/course/data/model/course_hive_model.dart';
+import 'package:uuid/uuid.dart';
 
-part 'auth_hive_model.g.dart'; // Hive code generation part
+part 'auth_hive_model.g.dart';
 
-@HiveType(typeId: HiveTableConstant.userTableId) // Ensure typeId matches your constant
+@HiveType(typeId: HiveTableConstant.studentTableId)
 class AuthHiveModel extends Equatable {
   @HiveField(0)
-  final String? userId;
-  
+  final String? studentId;
   @HiveField(1)
-  final String email;
-  
+  final String fName;
   @HiveField(2)
-  final String fname;
-  
+  final String lName;
   @HiveField(3)
-  final String lname;
-  
+  final String? image;
   @HiveField(4)
+  final String phone;
+  @HiveField(5)
+  final BatchHiveModel batch;
+  @HiveField(6)
+  final List<CourseHiveModel> courses;
+  @HiveField(7)
+  final String username;
+  @HiveField(8)
   final String password;
 
-  // Constructor to initialize the model
   AuthHiveModel({
-    String? userId,
-    required this.email,
-    required this.fname,
-    required this.lname,
+    String? studentId,
+    required this.fName,
+    required this.lName,
+    this.image,
+    required this.phone,
+    required this.batch,
+    required this.courses,
+    required this.username,
     required this.password,
-  }) : userId = userId ?? const Uuid().v4(); // Use UUID if userId is not provided
+  }) : studentId = studentId ?? const Uuid().v4();
 
-  // Initial Constructor with default values
+  // Initial Constructor
   const AuthHiveModel.initial()
-      : userId = '',
-        email = '',
-        fname = '',
-        lname = '',
+      : studentId = '',
+        fName = '',
+        lName = '',
+        image = '',
+        phone = '',
+        batch = const BatchHiveModel.initial(),
+        courses = const [],
+        username = '',
         password = '';
 
-  // From Entity: Converts AuthEntity to AuthHiveModel
+  // From Entity
   factory AuthHiveModel.fromEntity(AuthEntity entity) {
     return AuthHiveModel(
-      userId: entity.userId,
-      email: entity.email,
-      fname: entity.fname,
-      lname: entity.lname,
+      studentId: entity.userId,
+      fName: entity.fName,
+      lName: entity.lName,
+      image: entity.image,
+      phone: entity.phone,
+      batch: BatchHiveModel.fromEntity(entity.batch),
+      courses: CourseHiveModel.fromEntityList(entity.courses),
+      username: entity.username,
       password: entity.password,
     );
   }
 
-  // To Entity: Converts AuthHiveModel back to AuthEntity
+  // To Entity
   AuthEntity toEntity() {
     return AuthEntity(
-      email: email,
-      fname: fname,
-      lname: lname,
+      userId: studentId,
+      fName: fName,
+      lName: lName,
+      image: image,
+      phone: phone,
+      batch: batch.toEntity(),
+      courses: CourseHiveModel.toEntityList(courses),
+      username: username,
       password: password,
     );
   }
 
   @override
-  List<Object?> get props => [userId, email, fname, lname, password];
+  List<Object?> get props =>
+      [studentId, fName, lName, image, batch, courses, username, password];
 }
