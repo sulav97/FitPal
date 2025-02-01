@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class HomeView extends StatefulWidget {
-  const HomeView({super.key});
+  final String userName;
+  const HomeView({required this.userName , super.key});
 
   @override
   _HomeViewState createState() => _HomeViewState();
@@ -70,7 +71,7 @@ class _HomeViewState extends State<HomeView> {
           children: [
             // Welcome message
             Text(
-              "Hello, User!",
+              "Hello, ${widget.userName}",
               style: TextStyle(
                 fontSize: size.width * 0.06,
                 fontWeight: FontWeight.bold,

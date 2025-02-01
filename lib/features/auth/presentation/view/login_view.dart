@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'package:college_community_mobileapp/features/auth/presentation/view/register_view.dart';
 import 'package:college_community_mobileapp/features/bottom_navigation/presentation/view/bottom_navigation_view.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(const MyApp());
@@ -29,6 +31,7 @@ class LoginView extends StatefulWidget {
 class _LoginScreenState extends State<LoginView> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _isLoading = false; // For showing loading state
 
   @override
   Widget build(BuildContext context) {
@@ -110,31 +113,16 @@ class _LoginScreenState extends State<LoginView> {
                   width: double.infinity,
                   height: size.height * 0.065,
                   child: ElevatedButton(
-                    onPressed: () {
-                      if (_emailController.text.trim() == 'sulav@gmail.com' &&
-                          _passwordController.text.trim() == '12345678') {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  const BottomNavigationView()),
-                        );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content:
-                                Text('Invalid credentials. Please try again.'),
-                          ),
-                        );
-                      }
-                    },
+                    onPressed: _isLoading ? null : _login,  // Disable button when loading
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF896CFE),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
                     ),
-                    child: const Text(
+                    child: _isLoading
+                        ? const CircularProgressIndicator(color: Colors.white) // Show loading indicator
+                        : const Text(
                       'Log In',
                       style: TextStyle(
                         fontSize: 18,
@@ -158,13 +146,11 @@ class _LoginScreenState extends State<LoginView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _buildSocialIcon(
-                        Icons.g_mobiledata, const Color(0xFF896CFE)),
+                    _buildSocialIcon(Icons.g_mobiledata, const Color(0xFF896CFE)),
                     const SizedBox(width: 16),
                     _buildSocialIcon(Icons.facebook, const Color(0xFF896CFE)),
                     const SizedBox(width: 16),
-                    _buildSocialIcon(
-                        Icons.fingerprint, const Color(0xFF896CFE)),
+                    _buildSocialIcon(Icons.fingerprint, const Color(0xFF896CFE)),
                   ],
                 ),
                 const SizedBox(height: 24),
@@ -227,7 +213,7 @@ class _LoginScreenState extends State<LoginView> {
           decoration: InputDecoration(
             hintText: hint,
             hintStyle:
-                TextStyle(color: const Color(0xFF5E4AB9).withOpacity(0.3)),
+            TextStyle(color: const Color(0xFF5E4AB9).withOpacity(0.3)),
             filled: true,
             fillColor: const Color(0xFFECEAFF),
             border: OutlineInputBorder(
@@ -250,5 +236,68 @@ class _LoginScreenState extends State<LoginView> {
         color: Colors.white,
       ),
     );
+  }
+
+  // Login function that makes an HTTP request
+  Future<void> _login() async {
+
+
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if(email.isEmpty || password.isEmpty){
+      _showError("All Fields Required");
+      return;
+    }
+    if (!_isValidEmail(email)) {
+      _showError('Invalid email address.');
+      return;
+    }
+    setState(() {
+      _isLoading = true; // Show loading indicator
+    });
+    final response = await http.post(
+      Uri.parse('http://192.168.1.138:3000/login'),  // Replace with your backend API URL
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({
+        'email': email,
+        'password': password,
+      }),
+    );
+
+    setState(() {
+      _isLoading = false;  // Hide loading indicator
+    });
+
+    if (response.statusCode == 200) {
+      // Successfully logged in, navigate to the next screen
+      final data = json.decode(response.body);
+      final userName = data['user']['name'];  // Extract the user's name from the response
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+             BottomNavigationView(userName: userName)),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+       const SnackBar(content: Text("Login Success "),backgroundColor: Colors.green,),
+      );
+    } else {
+      // Invalid credentials, show error message
+      _showError('Invalid credentials. Please try again.');
+
+    }
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
+    );
+  }
+
+
+  bool _isValidEmail(String email) {
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+    return emailRegex.hasMatch(email);
   }
 }

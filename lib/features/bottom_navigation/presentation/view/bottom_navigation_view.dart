@@ -5,7 +5,8 @@ import 'package:college_community_mobileapp/features/bottom_navigation/presentat
 import 'package:flutter/material.dart';
 
 class BottomNavigationView extends StatefulWidget {
-  const BottomNavigationView({super.key});
+  final String userName;
+   const BottomNavigationView({required this.userName ,super.key});
 
   @override
   State<BottomNavigationView> createState() => _BottomNavigationViewState();
@@ -14,13 +15,7 @@ class BottomNavigationView extends StatefulWidget {
 class _BottomNavigationViewState extends State<BottomNavigationView> {
   int _selectedIndex = 0;
 
-  // List of screens corresponding to each bottom navigation item
-  final List<Widget> _screens = [
-    const HomeView(),
-    const WorkoutView(),
-    const NutritionView(),
-    const ProfileView(),
-  ];
+
 
   // Function to handle item tap
   void _onItemTapped(int index) {
@@ -31,6 +26,13 @@ class _BottomNavigationViewState extends State<BottomNavigationView> {
 
   @override
   Widget build(BuildContext context) {
+    // List of screens corresponding to each bottom navigation item
+    final List<Widget> _screens = [
+       HomeView(userName:widget.userName),
+      const WorkoutView(),
+      const NutritionView(),
+      const ProfileView(),
+    ];
     return Scaffold(
       body: _screens[_selectedIndex], // Show the selected screen
       bottomNavigationBar: BottomNavigationBar(
