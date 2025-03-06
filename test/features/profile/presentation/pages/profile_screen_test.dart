@@ -45,7 +45,7 @@ void main() {
     testWidgets('calls updateProfile when Update Profile button is pressed', (WidgetTester tester) async {
       // Arrange
       when(() => mockLoginCubit.state).thenReturn(LoginState.initially());
-      when(() => mockLoginCubit.updateProfile(any(), name: 'Sand', age: '25', weight: '70', height: '180', fitnessGoal: 'Maintain', profilepic: null)).thenReturn(null);
+      when(() => mockLoginCubit.updateProfile(any(), name: 'Sand', age: '25', weight: '70', height: '180', fitnessGoal: 'Maintain', profilepic: null)).thenReturn(true);
 
       // Act
       await tester.pumpWidget(

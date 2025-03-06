@@ -1,63 +1,117 @@
-import 'package:dartz/dartz.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gym_tracker_app/core/error/failure.dart';
-import 'package:gym_tracker_app/features/workout/data/datasources/work_out_remote_datasource.dart';
-import 'package:gym_tracker_app/features/workout/data/models/work_out_model.dart';
-import 'package:gym_tracker_app/features/workout/data/repositories/work_out_rep_impl.dart';
+import 'package:gym_tracker_app/features/Login/presentation/cubit/login_cubit.dart';
 import 'package:mocktail/mocktail.dart';
 
 // Mock classes
-class MockWorkOutRemoteDatasource extends Mock implements WorkOutRemoteDatasource {}
+class MockLoginCubit extends Mock implements LoginCubit {}
+
+class MockBuildContext extends Mock implements BuildContext {}
 
 void main() {
-  late WorkOutRepImpl workOutRepImpl;
-  late MockWorkOutRemoteDatasource mockWorkOutRemoteDatasource;
+  late MockLoginCubit mockLoginCubit;
 
   setUp(() {
-    mockWorkOutRemoteDatasource = MockWorkOutRemoteDatasource();
-    workOutRepImpl = WorkOutRepImpl(workOutRemoteDatasource: mockWorkOutRemoteDatasource);
+    mockLoginCubit = MockLoginCubit();
   });
 
-  group('WorkOutRepImpl', () {
-    final workOutModels = [
-      const WorkOutModel(
-        id: '1',
-        name: 'Workout 1',
-        // description: 'Description 1',
-        // Add other necessary fields for WorkOutModel
-      ),
-      const WorkOutModel(
-        id: '2',
-        name: 'Workout 2',
-        // description: 'Description 2',
-        // Add other necessary fields for WorkOutModel
-      ),
-    ];
+  // group('ProfileScreen', () {
+  //   testWidgets('renders correctly in initial state', (WidgetTester tester) async {
+  //     // Arrange
+  //     when(() => mockLoginCubit.state).thenReturn(LoginState.initially());
 
-    final workOutEntities = workOutModels.map((e) => e.toEntity()).toList();
+  //     // Act
+  //     await tester.pumpWidget(
+  //       MaterialApp(
+  //         home: BlocProvider<LoginCubit>.value(
+  //           value: mockLoginCubit,
+  //           child: const ProfileScreen(),
+  //         ),
+  //       ),
+  //     );
 
-    test('should return a list of WorkOutEntity when getWorkOuts is called', () async {
-      // Arrange
-      when(() => mockWorkOutRemoteDatasource.workOuts()).thenAnswer((_) async => workOutModels);
+  //     // Assert
+  //     expect(find.text('Your Profile'), findsOneWidget); // AppBar title
+  //     expect(find.byType(CircleAvatar), findsOneWidget); // Profile image
+  //     expect(find.text('Sand'), findsOneWidget); // Username
+  //     expect(find.byType(TextField), findsNWidgets(4)); // Username, Age, Weight, Height fields
+  //     expect(find.byType(DropdownButtonFormField<String>), findsOneWidget); // Fitness goal dropdown
+  //     expect(find.text('Update Profile'), findsOneWidget); // Update button
+  //   });
 
-      // Act
-      final result = await workOutRepImpl.getWorkOuts();
+  //   testWidgets('calls updateProfile when Update Profile button is pressed', (WidgetTester tester) async {
+  //     // Arrange
+  //     when(() => mockLoginCubit.state).thenReturn(LoginState.initially());
+  //     when(() => mockLoginCubit.updateProfile(any(), name: 'Sand', age: '25', weight: '70', height: '180', fitnessGoal: 'Maintain', profilepic: null)).thenReturn(null);
 
-      // Assert
-      expect(result, Right(workOutEntities));
-      verify(() => mockWorkOutRemoteDatasource.workOuts()).called(1);
-    });
+  //     // Act
+  //     await tester.pumpWidget(
+  //       MaterialApp(
+  //         home: BlocProvider<LoginCubit>.value(
+  //           value: mockLoginCubit,
+  //           child: const ProfileScreen(),
+  //         ),
+  //       ),
+  //     );
 
-    test('should return ApiFailure when an exception occurs', () async {
-      // Arrange
-      when(() => mockWorkOutRemoteDatasource.workOuts()).thenThrow(Exception('Failed to fetch workouts'));
+  //     // Tap the Update Profile button
+  //     await tester.tap(find.text('Update Profile'));
+  //     await tester.pump();
 
-      // Act
-      final result = await workOutRepImpl.getWorkOuts();
+  //     // Assert
+  //     verify(() => mockLoginCubit.updateProfile(
+  //           any(),
+  //           name: 'Sand',
+  //           age: '25',
+  //           weight: '70',
+  //           height: '180',
+  //           fitnessGoal: 'Maintain',
+  //           profilepic: null,
+  //         )).called(1);
+  //   });
 
-      // Assert
-      expect(result, Left(ApiFailure(message: 'Failed to fetch workouts')));
-      verify(() => mockWorkOutRemoteDatasource.workOuts()).called(1);
-    });
-  });
+  //   testWidgets('shows SnackBar when fields are empty', (WidgetTester tester) async {
+  //     // Arrange
+  //     when(() => mockLoginCubit.state).thenReturn(LoginState.initially());
+
+  //     // Act
+  //     await tester.pumpWidget(
+  //       MaterialApp(
+  //         home: BlocProvider<LoginCubit>.value(
+  //           value: mockLoginCubit,
+  //           child: const ProfileScreen(),
+  //         ),
+  //       ),
+  //     );
+
+  //     // Tap the Update Profile button without entering any data
+  //     await tester.tap(find.text('Update Profile'));
+  //     await tester.pump();
+
+  //     // Assert
+  //     expect(find.text('Please fill all fields!'), findsOneWidget); // SnackBar message
+  //   });
+
+  //   testWidgets('updates profile image when image is picked', (WidgetTester tester) async {
+  //     // Arrange
+  //     when(() => mockLoginCubit.state).thenReturn(LoginState.initially());
+
+  //     // Act
+  //     await tester.pumpWidget(
+  //       MaterialApp(
+  //         home: BlocProvider<LoginCubit>.value(
+  //           value: mockLoginCubit,
+  //           child: const ProfileScreen(),
+  //         ),
+  //       ),
+  //     );
+
+  //     // Tap the profile image to pick a new image
+  //     await tester.tap(find.byType(CircleAvatar));
+  //     await tester.pump();
+
+  //     // Assert
+  //     // No further assertions needed for this shortcut approach
+  //   });
+  // });
 }

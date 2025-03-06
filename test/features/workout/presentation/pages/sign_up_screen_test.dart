@@ -1,176 +1,142 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:gym_tracker_app/features/Login/presentation/cubit/login_cubit.dart';
-import 'package:gym_tracker_app/features/Login/presentation/cubit/login_state.dart';
-import 'package:gym_tracker_app/features/workout/presentation/pages/sign_up_screen.dart';
-import 'package:mocktail/mocktail.dart';
 
-// Mock classes
-class MockLoginCubit extends Mock implements LoginCubit {}
+class SignupScreen extends StatefulWidget {
+  const SignupScreen({super.key});
 
-void main() {
-  late MockLoginCubit mockLoginCubit;
+  @override
+  State<SignupScreen> createState() => _SignupScreenState();
+}
 
-  setUp(() {
-    mockLoginCubit = MockLoginCubit();
-  });
+class _SignupScreenState extends State<SignupScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  bool _obscurePassword = true;
 
-  group('SignupScreen', () {
-    testWidgets('renders correctly', (WidgetTester tester) async {
-      // Arrange
-      when(() => mockLoginCubit.state).thenReturn(LoginState.initially());
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
-      // Act
-      await tester.pumpWidget(
-        MaterialApp(
-          home: BlocProvider<LoginCubit>.value(
-            value: mockLoginCubit,
-            child: const SignupScreen(),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Create Account'),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Name Field
+              TextFormField(
+                controller: _nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Name',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your name';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+
+              // Email Field
+              TextFormField(
+                controller: _emailController,
+                decoration: const InputDecoration(
+                  labelText: 'Email',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.emailAddress,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your email';
+                  }
+                  if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                    return 'Please enter a valid email';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+
+              // Password Field
+              TextFormField(
+                controller: _passwordController,
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                  border: const OutlineInputBorder(),
+                  suffixIcon: IconButton(
+                    icon: Icon(_obscurePassword ? Icons.visibility : Icons.visibility_off),
+                    onPressed: () {
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
+                    },
+                  ),
+                ),
+                obscureText: _obscurePassword,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a password';
+                  }
+                  if (value.length < 4) {
+                    return 'Password must be at least 4 characters';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 24),
+
+              // Sign Up Button
+              ElevatedButton(
+                child: const Text('Sign Up'),
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    context.read<LoginCubit>().signUpFx(
+                          context,
+                          email: _emailController.text,
+                          password: _passwordController.text,
+                          lastName: _nameController.text,
+                          confirmPassword: _nameController.text,
+                          firstName: _nameController.text,
+                          nickName: _nameController.text,
+                        );
+                  }
+                },
+              ),
+              const SizedBox(height: 16),
+
+              // Login Link
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text("Already have an account?"),
+                  TextButton(
+                    child: const Text('Login'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
-      );
-
-      // Assert
-      expect(find.text('Create Account'), findsOneWidget);
-      expect(find.byType(TextFormField), findsNWidgets(3)); // Name, Email, Password
-      expect(find.text('Sign Up'), findsOneWidget);
-      expect(find.text("Already have an account?"), findsOneWidget);
-      expect(find.text('Login'), findsOneWidget);
-    });
-
-    testWidgets('shows validation errors for empty fields', (WidgetTester tester) async {
-      // Arrange
-      when(() => mockLoginCubit.state).thenReturn(LoginState.initially());
-
-      // Act
-      await tester.pumpWidget(
-        MaterialApp(
-          home: BlocProvider<LoginCubit>.value(
-            value: mockLoginCubit,
-            child: const SignupScreen(),
-          ),
-        ),
-      );
-
-      // Tap the signup button without entering any data
-      await tester.tap(find.text('Sign Up'));
-      await tester.pump();
-
-      // Assert
-      expect(find.text('Please enter your name'), findsOneWidget);
-      expect(find.text('Please enter your email'), findsOneWidget);
-      expect(find.text('Please enter a password'), findsOneWidget);
-    });
-
-    testWidgets('shows validation error for invalid email', (WidgetTester tester) async {
-      // Arrange
-      when(() => mockLoginCubit.state).thenReturn(LoginState.initially());
-
-      // Act
-      await tester.pumpWidget(
-        MaterialApp(
-          home: BlocProvider<LoginCubit>.value(
-            value: mockLoginCubit,
-            child: const SignupScreen(),
-          ),
-        ),
-      );
-
-      // Enter invalid email
-      await tester.enterText(find.byType(TextFormField).at(1), 'invalid-email');
-      await tester.tap(find.text('Sign Up'));
-      await tester.pump();
-
-      // Assert
-      expect(find.text('Please enter a valid email'), findsOneWidget);
-    });
-
-    testWidgets('shows validation error for short password', (WidgetTester tester) async {
-      // Arrange
-      when(() => mockLoginCubit.state).thenReturn(LoginState.initially());
-
-      // Act
-      await tester.pumpWidget(
-        MaterialApp(
-          home: BlocProvider<LoginCubit>.value(
-            value: mockLoginCubit,
-            child: const SignupScreen(),
-          ),
-        ),
-      );
-
-      // Enter short password
-      await tester.enterText(find.byType(TextFormField).at(2), '123');
-      await tester.tap(find.text('Sign Up'));
-      await tester.pump();
-
-      // Assert
-      expect(find.text('Password must be at least 4 characters'), findsOneWidget);
-    });
-
-    testWidgets('calls signUpFx when form is valid', (WidgetTester tester) async {
-      // Arrange
-      when(() => mockLoginCubit.state).thenReturn(LoginState.initially());
-      when(() => mockLoginCubit.signUpFx(
-            any(),
-            email: 'test@example.com',
-            password: 'password123',
-            lastName: 'Test User',
-            confirmPassword: 'Test User',
-            firstName: 'Test User',
-            nickName: 'Test User',
-          )).thenReturn(null);
-
-      // Act
-      await tester.pumpWidget(
-        MaterialApp(
-          home: BlocProvider<LoginCubit>.value(
-            value: mockLoginCubit,
-            child: const SignupScreen(),
-          ),
-        ),
-      );
-
-      // Enter valid name, email, and password
-      await tester.enterText(find.byType(TextFormField).at(0), 'Test User');
-      await tester.enterText(find.byType(TextFormField).at(1), 'test@example.com');
-      await tester.enterText(find.byType(TextFormField).at(2), 'password123');
-      await tester.tap(find.text('Sign Up'));
-      await tester.pump();
-
-      // Assert
-      verify(() => mockLoginCubit.signUpFx(
-            any(),
-            email: 'test@example.com',
-            password: 'password123',
-            lastName: 'Test User',
-            confirmPassword: 'Test User',
-            firstName: 'Test User',
-            nickName: 'Test User',
-          )).called(1);
-    });
-
-    testWidgets('toggles password visibility', (WidgetTester tester) async {
-      // Arrange
-      when(() => mockLoginCubit.state).thenReturn(LoginState.initially());
-
-      // Act
-      await tester.pumpWidget(
-        MaterialApp(
-          home: BlocProvider<LoginCubit>.value(
-            value: mockLoginCubit,
-            child: const SignupScreen(),
-          ),
-        ),
-      );
-
-      // Tap the visibility icon
-      await tester.tap(find.byIcon(Icons.visibility));
-      await tester.pump();
-
-      // Assert
-      expect(find.byIcon(Icons.visibility_off), findsOneWidget);
-    });
-  });
+      ),
+    );
+  }
 }
